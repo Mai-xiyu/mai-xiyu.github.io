@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mai_xiyu | Minecraft Mod Developer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 核心变量与重置 --- */
+        /* ================= 核心变量 ================= */
         :root {
-            --bg-color: #0D1117;
-            --card-bg: rgba(22, 27, 34, 0.7);
-            --border-color: #30363d;
-            --accent-color: #38BDAE; /* 你喜欢的青色 */
-            --docs-color: #7c4dff;   /* 文档专属紫色 */
-            --text-main: #c9d1d9;
+            --bg-color: #050505;
+            --card-bg: rgba(12, 12, 14, 0.7);
+            --border-color: rgba(56, 189, 174, 0.3);
+            --accent-cyan: #38BDAE;
+            --accent-green: #00ff41;
+            --docs-color: #7c4dff;
+            --text-main: #e0e0e0;
             --text-muted: #8b949e;
+            --terminal-bg: rgba(5, 5, 5, 0.85);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,203 +29,382 @@
             font-family: 'Inter', sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 0%, #1f2937 0%, #0D1117 70%);
             min-height: 100vh;
+            position: relative;
         }
 
-        /* --- 布局容器 --- */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        #tsparticles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- 头部区域 --- */
         header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 70px;
             animation: fadeInDown 1s ease-out;
         }
 
         .avatar {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            border: 3px solid var(--accent-color);
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(56, 189, 174, 0.3);
+            border: 2px solid var(--accent-cyan);
+            margin-bottom: 25px;
+            box-shadow: 0 0 20px rgba(56, 189, 174, 0.4);
+            animation: pulse-glow 3s infinite alternate;
+            transition: transform 0.3s ease;
+            filter: grayscale(20%) contrast(120%);
+        }
+
+        .avatar:hover {
+            transform: scale(1.05) rotate(5deg);
+            filter: grayscale(0%) contrast(120%);
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 10px rgba(56, 189, 174, 0.3), 0 0 20px rgba(0, 255, 65, 0.1); }
+            100% { box-shadow: 0 0 25px rgba(56, 189, 174, 0.6), 0 0 40px rgba(0, 255, 65, 0.3); }
         }
 
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            letter-spacing: -1px;
             font-weight: 700;
+            color: var(--text-main);
+            text-shadow: 2px 2px 0px rgba(56, 189, 174, 0.5), -2px -2px 0px rgba(124, 77, 255, 0.5);
         }
 
         .typing-container {
             font-family: 'Fira Code', monospace;
-            color: var(--accent-color);
-            font-size: 1.1rem;
+            color: var(--accent-green);
+            font-size: 1.2rem;
             height: 1.5em; /* 防止高度跳动 */
+            text-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
         }
 
-        /* --- 社交链接与跳转 --- */
+        .cursor {
+            font-weight: bold;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
         .social-links {
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 25px;
+            margin-top: 35px;
             flex-wrap: wrap;
         }
 
         .btn {
             text-decoration: none;
             padding: 10px 20px;
-            border-radius: 8px;
-            background: var(--card-bg);
+            border-radius: 4px;
+            background: rgba(12, 12, 14, 0.6);
             border: 1px solid var(--border-color);
             color: var(--text-main);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
+            gap: 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            backdrop-filter: blur(8px);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 174, 0.2), transparent);
+            transition: all 0.4s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            border-color: var(--accent-color);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            background: rgba(0, 255, 65, 0.05);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            color: white;
         }
 
-        /* 文档按钮特殊效果 */
         .btn-docs {
-            border-color: rgba(124, 77, 255, 0.4);
-            background: rgba(124, 77, 255, 0.1);
+            border-color: rgba(124, 77, 255, 0.5);
+            color: #d1c4e9;
         }
 
         .btn-docs:hover {
             border-color: var(--docs-color);
+            color: #fff;
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.4);
-            color: white;
+            background: rgba(124, 77, 255, 0.1);
         }
 
-        /* --- 状态面板 (Grid) --- */
+        /* ================= Grid 系统 ================= */
         .grid-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 25px;
-            transition: transform 0.3s ease;
-            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--text-muted);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 8px 32px rgba(56, 189, 174, 0.15);
         }
 
-        .card h3 {
-            color: var(--accent-color);
-            margin-bottom: 15px;
+        /* ================= 终端模拟卡片 ================= */
+        .terminal-header {
+            background: #1e1e1e;
+            padding: 10px 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            border-bottom: 1px solid #333;
+            transform: translateZ(10px);
         }
 
-        .stat-item {
+        .mac-btns {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
+            gap: 6px;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
+        .mac-btns span {
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
-            background-color: #2ea043; /* Green */
             display: inline-block;
-            margin-right: 5px;
-            box-shadow: 0 0 5px #2ea043;
+        }
+        .mac-btns span:nth-child(1) { background: #ff5f56; }
+        .mac-btns span:nth-child(2) { background: #ffbd2e; }
+        .mac-btns span:nth-child(3) { background: #27c93f; }
+
+        .terminal-title {
+            color: #888;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            margin-left: 15px;
         }
 
-        /* --- 项目展示 --- */
+        .terminal-body {
+            padding: 25px;
+            font-family: 'Fira Code', monospace;
+            transform: translateZ(20px);
+        }
+
+        .cmd-line {
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .cmd-prompt {
+            color: var(--accent-cyan);
+            margin-right: 8px;
+            font-weight: 700;
+        }
+
+        .cmd-output {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 2px solid #333;
+        }
+        
+        .output-highlight {
+            color: var(--accent-green);
+        }
+
+        /* ================= 普通项目卡片 ================= */
+        .projects-card {
+            padding: 30px;
+        }
+
+        .projects-card h3 {
+            color: #fff;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            font-family: 'Fira Code', monospace;
+            transform: translateZ(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+
+        .projects-card h3 i {
+            color: var(--accent-green);
+        }
+
         .project-list {
             list-style: none;
+            transform: translateZ(15px);
         }
 
         .project-item {
             margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .project-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--accent-cyan);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .project-item:hover {
+            background: rgba(56, 189, 174, 0.05);
+            border-color: rgba(56, 189, 174, 0.2);
+            transform: translateX(5px);
+        }
+
+        .project-item:hover::before {
+            transform: scaleY(1);
         }
 
         .project-item:last-child {
-            border-bottom: none;
+            margin-bottom: 0;
         }
 
         .project-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .project-title {
+            color: #fff;
+            font-weight: 600;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .tech-tag {
-            font-size: 0.75rem;
-            padding: 2px 8px;
+            font-size: 0.7rem;
+            padding: 3px 8px;
             border-radius: 4px;
-            background: rgba(56, 189, 174, 0.1);
-            color: var(--accent-color);
-            border: 1px solid rgba(56, 189, 174, 0.2);
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            font-family: 'Fira Code', monospace;
+            text-transform: uppercase;
         }
 
-        /* --- 页脚 --- */
+        /* ================= 页脚 ================= */
         footer {
             text-align: center;
-            margin-top: 60px;
+            margin-top: 80px;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            padding-top: 30px;
+            border-top: 1px dashed #333;
+            font-family: 'Fira Code', monospace;
         }
 
-        /* --- 动画 Keyframes --- */
+        /* ================= 动画与其他 ================= */
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(-30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 600px) {
-            h1 { font-size: 2rem; }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
             .social-links { gap: 10px; }
-            .btn { padding: 8px 15px; font-size: 0.9rem; }
+            .btn { padding: 8px 14px; font-size: 0.85rem; }
+            .terminal-body, .projects-card { padding: 20px; }
         }
     </style>
 </head>
 <body>
 
+<div id="tsparticles"></div>
+
 <div class="container">
     <header>
         <img src="https://github.com/Mai-xiyu.png" alt="Mai_xiyu" class="avatar">
-        <h1>Mai_xiyu</h1>
+        <h1>[Mai_xiyu]</h1>
         <div class="typing-container">
-            <span id="typing-text"></span><span class="cursor">|</span>
+            <span id="typing-text"></span><span class="cursor">_</span>
         </div>
 
         <div class="social-links">
             <a href="https://mai-xiyu.github.io/ProJect_Docs/" class="btn btn-docs" target="_blank">
-                <i class="fas fa-book-open"></i> My ProJect Docs
+                <i class="fas fa-terminal"></i> Docs
             </a>
-            
             <a href="https://github.com/Mai-xiyu" class="btn" target="_blank"><i class="fab fa-github"></i> GitHub</a>
             <a href="https://modrinth.com/user/Mai_xiyu" class="btn" target="_blank"><i class="fas fa-cube"></i> Modrinth</a>
             <a href="https://space.bilibili.com/1339435908" class="btn" target="_blank"><i class="fab fa-bilibili"></i> Bilibili</a>
@@ -232,55 +413,68 @@
     </header>
 
     <div class="grid-section">
-        <div class="card">
-            <h3><i class="fas fa-terminal"></i> System Status</h3>
-            <div class="stat-item">
-                <span><span class="status-dot"></span>Nginx Server</span>
-                <span>Running</span>
+        <!-- 极客终端卡片 -->
+        <div class="card" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.15">
+            <div class="terminal-header">
+                <div class="mac-btns">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="terminal-title">mai@server:~</div>
             </div>
-            <div class="stat-item">
-                <span><span class="status-dot"></span>Mod Dev Env</span>
-                <span>Active</span>
-            </div>
-            <div class="stat-item">
-                <span><i class="fas fa-memory"></i> Stack</span>
-                <span>Java / C++ / Qt</span>
-            </div>
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <p style="font-size: 0.9rem; color: var(--text-muted);">
-                    Welcome to my local development hub. Hosting personal projects and testing Minecraft server logic.
-                </p>
+            <div class="terminal-body">
+                <div class="cmd-line">
+                    <span class="cmd-prompt">mai@server:~$</span> ./check_status.sh
+                </div>
+                <div class="cmd-output">
+                    [+] Nginx Server: <span class="output-highlight">ONLINE</span><br>
+                    [+] Mod Dev Env: <span class="output-highlight">ACTIVE</span><br>
+                    [+] Core Stack: Java, C++, TypeScript, Qt
+                </div>
+                
+                <div class="cmd-line">
+                    <span class="cmd-prompt">mai@server:~$</span> cat about.txt
+                </div>
+                <div class="cmd-output" style="color: #bbb; line-height: 1.8;">
+                    Welcome to my logical domain.<br>
+                    > Developing Minecraft server architectures.<br>
+                    > Optimizing computational performance.<br>
+                    > Keep reinventing the wheel playfully.
+                </div>
+                <div class="cmd-line">
+                    <span class="cmd-prompt">mai@server:~$</span> <span class="cursor" style="color: #fff;">_</span>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <h3><i class="fas fa-trophy"></i> Featured Projects</h3>
+        <!-- 极客项目卡片 -->
+        <div class="card projects-card" data-tilt data-tilt-max="3" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.15">
+            <h3><i class="fas fa-code-branch"></i> ~/Repositories</h3>
             <ul class="project-list">
                 <li class="project-item">
                     <div class="project-header">
-                        <strong>OneKeyMiner</strong>
-                        <span class="tech-tag">Java / Forge / Neo</span>
+                        <span class="project-title">OneKeyMiner</span>
+                        <span class="tech-tag">Java / NeoForge</span>
                     </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        旗舰项目。高性能连锁挖掘/种植，全平台兼容，极致的服务端优化。
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+                        High-performance vein mining sys. Extreme server-side logic optimization and cross-platform compatible.
                     </p>
                 </li>
                 <li class="project-item">
                     <div class="project-header">
-                        <strong>Piglin Join WTO</strong>
-                        <span class="tech-tag">AI Logic / Mixin</span>
+                        <span class="project-title">Piglin Join WTO</span>
+                        <span class="tech-tag">AI / Mixin</span>
                     </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        行为重构。让猪灵拥有复杂的经济交易系统。
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+                        Behavior overhaul. Establishing a complex dynamic economic trading model for Piglins based on AI logic.
                     </p>
                 </li>
                 <li class="project-item">
                     <div class="project-header">
-                        <strong>Hour Clock 24</strong>
+                        <span class="project-title">Hour Clock 24</span>
                         <span class="tech-tag">Time Algo</span>
                     </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        算法同步。将 Minecraft 刻度时间与现实 24 小时制动态映射。
+                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+                        Time synchronization algorithm. Mapping Minecraft's tick-based time to a seamless 24-hour real-time clock.
                     </p>
                 </li>
             </ul>
@@ -288,19 +482,21 @@
     </div>
 
     <footer>
-        <p>© 2026 Mai_xiyu / Arc Studio.</p>
-        <p style="font-size: 0.8rem; margin-top: 5px; opacity: 0.6;">Powered by Nginx & Coffee ☕</p>
+        <p>System initialized at: 2026. Mai_xiyu / Arc Studio.</p>
+        <p style="margin-top: 8px; opacity: 0.4;">Connection secured. Powered by pure static logic.</p>
     </footer>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tsparticles/preset-links@3.0.2/tsparticles.preset.links.bundle.min.js"></script>
+
 <script>
-    // --- 纯 JS 打字机效果 ---
     const textElement = document.getElementById('typing-text');
     const texts = [
-        "Minecraft Mod Developer",
-        "Java / C++ Enthusiast",
-        "NeoForge Ecosystem Contributor",
-        "Server-side Performance Expert"
+        "Initialize: Mod Developer",
+        "Loading: Java / C++ stack",
+        "Executing: NeoForge Ecosystem",
+        "Status: Server Optimization Expert"
     ];
     let textIndex = 0;
     let charIndex = 0;
@@ -308,32 +504,76 @@
     let typeSpeed = 100;
 
     function type() {
+        if (!textElement) return;
         const currentText = texts[textIndex];
         
         if (isDeleting) {
             textElement.textContent = currentText.substring(0, charIndex - 1);
             charIndex--;
-            typeSpeed = 50; // 删除速度快一点
+            typeSpeed = 30; 
         } else {
             textElement.textContent = currentText.substring(0, charIndex + 1);
             charIndex++;
-            typeSpeed = 100; // 输入速度
+            typeSpeed = 60 + Math.random() * 40; // 模拟真实打字随机延迟
         }
 
         if (!isDeleting && charIndex === currentText.length) {
             isDeleting = true;
-            typeSpeed = 2000; // 输入完后停顿 2秒
+            typeSpeed = 2500; 
         } else if (isDeleting && charIndex === 0) {
             isDeleting = false;
             textIndex = (textIndex + 1) % texts.length;
-            typeSpeed = 500; // 删除完后停顿 0.5秒
+            typeSpeed = 300; 
         }
 
         setTimeout(type, typeSpeed);
     }
 
-    // 启动打字机
     document.addEventListener('DOMContentLoaded', type);
+
+    if (typeof tsParticles !== 'undefined') {
+        tsParticles.load({
+            id: "tsparticles",
+            options: {
+                preset: "links",
+                background: { color: { value: "transparent" } },
+                particles: {
+                    color: { value: "#00ff41" }, // matrix green
+                    links: {
+                        color: "#38BDAE", // cyan
+                        distance: 140,
+                        enable: true,
+                        opacity: 0.3,
+                        width: 1,
+                    },
+                    move: {
+                        enable: true,
+                        speed: 1,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        outModes: "out",
+                    },
+                    number: {
+                        density: { enable: true, width: 800 },
+                        value: 80,
+                    },
+                    opacity: { value: 0.6 },
+                    shape: { type: "circle" },
+                    size: { value: { min: 1, max: 2 } },
+                },
+                interactivity: {
+                    events: {
+                        onHover: { enable: true, mode: "repulse" }, // 极客风：鼠标排斥粒子
+                    },
+                    modes: {
+                        repulse: { distance: 100, duration: 0.4 },
+                    },
+                },
+                detectRetina: true,
+            }
+        });
+    }
 </script>
 
 </body>
