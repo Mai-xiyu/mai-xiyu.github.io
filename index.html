@@ -3,227 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mai_xiyu | Minecraft Mod Developer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>Mai_xiyu | Mod Developer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 核心变量与重置 --- */
         :root {
-            --bg-color: #0D1117;
-            --card-bg: rgba(22, 27, 34, 0.7);
-            --border-color: #30363d;
-            --accent-color: #38BDAE; /* 你喜欢的青色 */
-            --docs-color: #7c4dff;   /* 文档专属紫色 */
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
+            --bg-color: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-blur: 24px;
+            --accent: #3b82f6;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --term-bg: #111116;
+            --term-header: #1f1f24;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 0%, #1f2937 0%, #0D1117 70%);
             min-height: 100vh;
         }
 
-        /* --- 布局容器 --- */
+        /* ====== Loader Animation (Tech / Agency Vibe) ====== */
+        #loader {
+            position: fixed; inset: 0; z-index: 10000;
+            background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        .loaded #loader {
+            transform: translateY(-100%);
+        }
+        .loader-content {
+            width: 0; height: 2px; background: #fff;
+            animation: lineExpand 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .loader-text {
+            margin-top: 15px; font-family: 'Fira Code', monospace;
+            font-size: 0.8rem; letter-spacing: 6px; color: #555;
+            opacity: 0; animation: fadeText 1s forwards 0.3s;
+        }
+        @keyframes lineExpand { 0% { width: 0; } 100% { width: 250px; } }
+        @keyframes fadeText { to { opacity: 1; } }
+
+        /* 内容进场排版动画 */
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px;
+            max-width: 1000px; margin: 0 auto; padding: 80px 20px;
+            position: relative; z-index: 1;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 1s ease 0.4s, transform 1s cubic-bezier(0.25, 1, 0.25, 1) 0.4s;
+        }
+        .loaded .container { opacity: 1; transform: translateY(0); }
+
+        /* ====== 动态流体背景 ====== */
+        .bg-blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .blob {
+            position: absolute; border-radius: 50%; filter: blur(100px);
+            animation: floatBlob 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+        }
+        .blob-1 { width: 50vw; height: 50vw; background: rgba(59, 130, 246, 0.15); top: -20%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 40vw; height: 40vw; background: rgba(16, 185, 129, 0.12); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .blob-3 { width: 30vw; height: 30vw; background: rgba(139, 92, 246, 0.15); top: 40%; left: 30%; animation-delay: -10s; }
+        
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 10%) scale(1.1); }
+            100% { transform: translate(-5%, -5%) scale(0.95); }
         }
 
-        /* --- 头部区域 --- */
-        header {
-            text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInDown 1s ease-out;
-        }
-
+        /* ====== Header ====== */
+        header { text-align: center; margin-bottom: 70px; }
         .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 3px solid var(--accent-color);
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(56, 189, 174, 0.3);
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 1px solid var(--glass-border); margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .typing-container {
-            font-family: 'Fira Code', monospace;
-            color: var(--accent-color);
-            font-size: 1.1rem;
-            height: 1.5em; /* 防止高度跳动 */
-        }
-
-        /* --- 社交链接与跳转 --- */
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
+        .avatar:hover { transform: scale(1.05) translateY(-5px); }
+        
+        h1 { font-size: 2.5rem; font-weight: 700; letter-spacing: -1px; margin-bottom: 10px; }
+        .typing-container { font-family: 'Fira Code', monospace; color: var(--text-muted); font-size: 1rem; height: 1.5em; }
+        .cursor { font-weight: 500; color: var(--accent); animation: blink 1s step-end infinite; }
+        
+        .social-links { display: flex; justify-content: center; gap: 12px; margin-top: 35px; flex-wrap: wrap; }
         .btn {
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(10px);
+            text-decoration: none; padding: 10px 20px; border-radius: 8px;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: var(--text-main); font-size: 0.9rem; font-weight: 500;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
         }
+        .btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
 
-        .btn:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            color: white;
-        }
-
-        /* 文档按钮特殊效果 */
-        .btn-docs {
-            border-color: rgba(124, 77, 255, 0.4);
-            background: rgba(124, 77, 255, 0.1);
-        }
-
-        .btn-docs:hover {
-            border-color: var(--docs-color);
-            box-shadow: 0 0 15px rgba(124, 77, 255, 0.4);
-            color: white;
-        }
-
-        /* --- 状态面板 (Grid) --- */
-        .grid-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
+        /* ====== Grid ====== */
+        .grid-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 30px; margin-bottom: 60px; }
 
         .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 25px;
-            transition: transform 0.3s ease;
-            backdrop-filter: blur(5px);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 16px; backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2); overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover { border-color: rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+
+        /* ====== 真 · 终端卡片 (仿 MacOS/VSCode) ====== */
+        .terminal-card {
+            background: var(--term-bg);
+            border: 1px solid #2d2d30;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            border-radius: 10px; /* 稍微小一点的圆角更像真实的窗口 */
+            backdrop-filter: none; /* 终端不透明，形成实包虚的对比高级感 */
+        }
+        .terminal-header {
+            background: linear-gradient(180deg, #323237, #1f1f24);
+            padding: 12px 16px; display: flex; align-items: center;
+            border-bottom: 1px solid #000;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .mac-btns { display: flex; gap: 8px; }
+        .mac-btns span { width: 12px; height: 12px; border-radius: 50%; }
+        .mac-btns span:nth-child(1) { background: #ff5f56; border: 1px solid #e0443e; }
+        .mac-btns span:nth-child(2) { background: #ffbd2e; border: 1px solid #dea123; }
+        .mac-btns span:nth-child(3) { background: #27c93f; border: 1px solid #1aab29; }
+        .terminal-title {
+            color: #8b949e; font-size: 0.75rem; margin: 0 auto;
+            transform: translateX(-24px); font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+        .terminal-body {
+            padding: 24px; font-family: 'Fira Code', monospace;
+            height: 480px; overflow-y: auto; scroll-behavior: smooth;
+            font-size: 0.9rem; line-height: 1.5; color: #d4d4d4;
+        }
+        .terminal-body::-webkit-scrollbar { width: 8px; }
+        .terminal-body::-webkit-scrollbar-thumb { background: #424242; border-radius: 4px; }
+        .cmd-line { margin-bottom: 8px; }
+        .cmd-prompt { color: #569cd6; font-weight: 500; margin-right: 8px; }
+        .cmd-output { color: #cccccc; margin-bottom: 16px; word-wrap: break-word; }
+        .output-highlight { color: #4ec9b0; }
+        .interactive-line { display: flex; align-items: center; }
+        #terminal-input {
+            background: transparent; border: none; color: #d4d4d4;
+            font-family: 'Fira Code', monospace; font-size: 0.9rem; outline: none; flex: 1;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--text-muted);
+        /* ====== Github Repos Card ====== */
+        .projects-card { padding: 30px; display: flex; flex-direction: column; height: 100%; max-height: 525px;}
+        .projects-card h3 {
+            margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
+            font-size: 1.2rem; font-weight: 600; letter-spacing: -0.5px;
         }
+        .live-badge {
+            font-size: 0.7rem; color: #94a3b8; font-weight: 500; margin-left: auto;
+            display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.3);
+            padding: 4px 10px; border-radius: 12px; border: 1px solid var(--glass-border);
+        }
+        .live-dot { width: 6px; height: 6px; background: var(--accent-green); border-radius: 50%; box-shadow: 0 0 8px var(--accent-green); animation: pulse 2s infinite; }
+        @keyframes pulse { 50% { opacity: 0.3; } }
 
-        .card h3 {
-            color: var(--accent-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .project-list { 
+            list-style: none; overflow-y: auto; padding-right: 10px; flex: 1; 
         }
-
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.9rem;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #2ea043; /* Green */
-            display: inline-block;
-            margin-right: 5px;
-            box-shadow: 0 0 5px #2ea043;
-        }
-
-        /* --- 项目展示 --- */
-        .project-list {
-            list-style: none;
-        }
+        .project-list::-webkit-scrollbar { width: 4px; }
+        .project-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
         .project-item {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 14px; padding: 16px; border-radius: 12px;
+            background: rgba(255,255,255,0.02); border: 1px solid transparent;
+            transition: all 0.3s ease; position: relative;
         }
-
-        .project-item:last-child {
-            border-bottom: none;
+        .project-item::before {
+            content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 2px;
+            background: var(--accent); transform: scaleY(0); transition: transform 0.3s ease;
+            border-radius: 0 2px 2px 0;
         }
-
-        .project-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
+        .project-item:hover { background: rgba(255,255,255,0.05); border-color: var(--glass-border); transform: translateX(4px); }
+        .project-item:hover::before { transform: scaleY(1); }
+        
+        .project-link { text-decoration: none; display: block; color: inherit; }
+        .project-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .project-title { color: var(--text-main); font-weight: 600; font-size: 1rem; transition: color 0.2s; }
+        .project-item:hover .project-title { color: var(--accent); }
         .tech-tag {
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: rgba(56, 189, 174, 0.1);
-            color: var(--accent-color);
-            border: 1px solid rgba(56, 189, 174, 0.2);
+            font-size: 0.65rem; padding: 3px 8px; border-radius: 20px;
+            background: rgba(59, 130, 246, 0.1); color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.2); font-family: 'Fira Code', monospace;
         }
+        .project-item p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
 
-        /* --- 页脚 --- */
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
+        @keyframes skeleton-pulse { 0%,100% { opacity: 0.2; } 50% { opacity: 0.5; } }
+        .skeleton-loader { animation: skeleton-pulse 1.5s infinite; }
 
-        /* --- 动画 Keyframes --- */
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        footer { text-align: center; margin-top: 80px; color: #475569; font-size: 0.85rem; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             h1 { font-size: 2rem; }
-            .social-links { gap: 10px; }
-            .btn { padding: 8px 15px; font-size: 0.9rem; }
+            .grid-section { grid-template-columns: 1fr; }
+            .terminal-body { height: 350px; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div id="loader">
+    <div class="loader-content"></div>
+    <div class="loader-text">INITIALIZING...</div>
+</div>
+
+<div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<div class="container" id="main-content">
     <header>
         <img src="https://github.com/Mai-xiyu.png" alt="Mai_xiyu" class="avatar">
         <h1>Mai_xiyu</h1>
         <div class="typing-container">
-            <span id="typing-text"></span><span class="cursor">|</span>
+            <span id="typing-text"></span><span class="cursor">_</span>
         </div>
-
         <div class="social-links">
-            <a href="https://mai-xiyu.github.io/ProJect_Docs/" class="btn btn-docs" target="_blank">
-                <i class="fas fa-book-open"></i> My ProJect Docs
-            </a>
-            
+            <a href="https://mai-xiyu.github.io/ProJect_Docs/" class="btn" target="_blank"><i class="fas fa-book"></i> Docs</a>
             <a href="https://github.com/Mai-xiyu" class="btn" target="_blank"><i class="fab fa-github"></i> GitHub</a>
             <a href="https://modrinth.com/user/Mai_xiyu" class="btn" target="_blank"><i class="fas fa-cube"></i> Modrinth</a>
             <a href="https://space.bilibili.com/1339435908" class="btn" target="_blank"><i class="fab fa-bilibili"></i> Bilibili</a>
@@ -232,109 +242,403 @@
     </header>
 
     <div class="grid-section">
-        <div class="card">
-            <h3><i class="fas fa-terminal"></i> System Status</h3>
-            <div class="stat-item">
-                <span><span class="status-dot"></span>Nginx Server</span>
-                <span>Running</span>
+        <div class="card terminal-card">
+            <div class="terminal-header">
+                <div class="mac-btns"><span></span><span></span><span></span></div>
+                <div class="terminal-title">mai@server:~</div>
             </div>
-            <div class="stat-item">
-                <span><span class="status-dot"></span>Mod Dev Env</span>
-                <span>Active</span>
-            </div>
-            <div class="stat-item">
-                <span><i class="fas fa-memory"></i> Stack</span>
-                <span>Java / C++ / Qt</span>
-            </div>
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
-                <p style="font-size: 0.9rem; color: var(--text-muted);">
-                    Welcome to my local development hub. Hosting personal projects and testing Minecraft server logic.
-                </p>
+            <div class="terminal-body">
+                <div class="cmd-line">
+                    <span class="cmd-prompt">~/desktop $</span> ./init_session.sh
+                </div>
+                <div class="cmd-output">
+                    [+] Environment: <span class="output-highlight">ACTIVE</span><br>
+                    [+] Workspace: Clean & Ready<br>
+                    [+] Type "help" for commands.
+                </div>
+                <div class="cmd-line interactive-line">
+                    <span class="cmd-prompt">~/desktop $</span>
+                    <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" autofocus>
+                </div>
             </div>
         </div>
 
-        <div class="card">
-            <h3><i class="fas fa-trophy"></i> Featured Projects</h3>
-            <ul class="project-list">
-                <li class="project-item">
-                    <div class="project-header">
-                        <strong>OneKeyMiner</strong>
-                        <span class="tech-tag">Java / Forge / Neo</span>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        旗舰项目。高性能连锁挖掘/种植，全平台兼容，极致的服务端优化。
-                    </p>
-                </li>
-                <li class="project-item">
-                    <div class="project-header">
-                        <strong>Piglin Join WTO</strong>
-                        <span class="tech-tag">AI Logic / Mixin</span>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        行为重构。让猪灵拥有复杂的经济交易系统。
-                    </p>
-                </li>
-                <li class="project-item">
-                    <div class="project-header">
-                        <strong>Hour Clock 24</strong>
-                        <span class="tech-tag">Time Algo</span>
-                    </div>
-                    <p style="font-size: 0.9rem; color: var(--text-muted);">
-                        算法同步。将 Minecraft 刻度时间与现实 24 小时制动态映射。
-                    </p>
-                </li>
+        <div class="card projects-card">
+            <h3>
+                <i class="fas fa-layer-group"></i> All Repositories
+                <span class="live-badge"><span class="live-dot"></span> Live Sync</span>
+            </h3>
+            <ul class="project-list" id="github-repos-list">
+                <li class="project-item skeleton-loader" style="height:70px;"></li>
+                <li class="project-item skeleton-loader" style="height:70px;"></li>
+                <li class="project-item skeleton-loader" style="height:70px;"></li>
+                <li class="project-item skeleton-loader" style="height:70px;"></li>
             </ul>
         </div>
     </div>
 
     <footer>
-        <p>© 2026 Mai_xiyu / Arc Studio.</p>
-        <p style="font-size: 0.8rem; margin-top: 5px; opacity: 0.6;">Powered by Nginx & Coffee ☕</p>
+        <p>&copy; 2026 Mai_xiyu.</p>
     </footer>
 </div>
 
 <script>
-    // --- 纯 JS 打字机效果 ---
+    // ================= 科技感进场动画 =================
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.body.classList.add('loaded');
+        }, 1200); // 留出一点时间画线
+    });
+
+    // ================= 打字机 =================
     const textElement = document.getElementById('typing-text');
     const texts = [
-        "Minecraft Mod Developer",
-        "Java / C++ Enthusiast",
-        "NeoForge Ecosystem Contributor",
-        "Server-side Performance Expert"
+        "Crafting Minecraft Worlds",
+        "Systems & Server Architecture",
+        "Exploring Clean Code",
+        "Java / C++ / TypeScript"
     ];
-    let textIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    let typeSpeed = 100;
+    let textIndex = 0, charIndex = 0, isDeleting = false, typeSpeed = 80;
 
     function type() {
-        const currentText = texts[textIndex];
-        
-        if (isDeleting) {
-            textElement.textContent = currentText.substring(0, charIndex - 1);
-            charIndex--;
-            typeSpeed = 50; // 删除速度快一点
-        } else {
-            textElement.textContent = currentText.substring(0, charIndex + 1);
-            charIndex++;
-            typeSpeed = 100; // 输入速度
-        }
-
-        if (!isDeleting && charIndex === currentText.length) {
-            isDeleting = true;
-            typeSpeed = 2000; // 输入完后停顿 2秒
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            textIndex = (textIndex + 1) % texts.length;
-            typeSpeed = 500; // 删除完后停顿 0.5秒
-        }
-
+        if (!textElement) return;
+        const cur = texts[textIndex];
+        if (isDeleting) { textElement.textContent = cur.substring(0, --charIndex); typeSpeed = 30; }
+        else { textElement.textContent = cur.substring(0, ++charIndex); typeSpeed = 50 + Math.random() * 50; }
+        if (!isDeleting && charIndex === cur.length) { isDeleting = true; typeSpeed = 2500; }
+        else if (isDeleting && charIndex === 0) { isDeleting = false; textIndex = (textIndex + 1) % texts.length; typeSpeed = 500; }
         setTimeout(type, typeSpeed);
     }
+    setTimeout(type, 1800); // 等待画面入场后再打字
 
-    // 启动打字机
-    document.addEventListener('DOMContentLoaded', type);
+    // ================= GitHub 获取全部非 Fork 仓库 =================
+    async function fetchGitHubRepos() {
+        const list = document.getElementById('github-repos-list');
+        try {
+            // 拉取最多 100 个仓库
+            const res = await fetch('https://api.github.com/users/Mai-xiyu/repos?sort=updated&per_page=100');
+            if (!res.ok) throw new Error('API error');
+            let repos = await res.json();
+            
+            // 过滤掉 folk 和 首页配置仓库
+            let filtered = repos.filter(r => !r.fork && r.name !== 'Mai-xiyu' && r.name !== 'mai-xiyu.github.io');
+            
+            // 根据 stars 数量 + 更新时间 简单排序 (把优质项目顶到前面)
+            filtered.sort((a, b) => b.stargazers_count - a.stargazers_count || new Date(b.pushed_at) - new Date(a.pushed_at));
+            
+            list.innerHTML = '';
+            filtered.forEach(repo => {
+                const desc = repo.description || 'No description provided.';
+                const li = document.createElement('li');
+                li.className = 'project-item';
+                li.innerHTML = `<a href="${repo.html_url}" target="_blank" class="project-link">
+                    <div class="project-header">
+                        <span class="project-title">${repo.name} 
+                            ${repo.stargazers_count > 0 ? `<span style="color:#eab308;font-size:0.75rem;margin-left:6px;"><i class="fas fa-star"></i> ${repo.stargazers_count}</span>` : ''}
+                        </span>
+                        <span class="tech-tag">${repo.language || 'Any'}</span>
+                    </div>
+                    <p>${desc}</p>
+                </a>`;
+                list.appendChild(li);
+            });
+        } catch (e) {
+            list.innerHTML = '<li class="project-item"><p>Failed to load repos. <a href="https://github.com/Mai-xiyu" target="_blank" style="color:var(--accent)">Visit GitHub</a></p></li>';
+        }
+    }
+    fetchGitHubRepos();
+
+    // ================= 终端交互 =================
+    document.addEventListener('DOMContentLoaded', () => {
+        const terminalBody = document.querySelector('.terminal-body');
+        const terminalInput = document.getElementById('terminal-input');
+        const interactiveLine = document.querySelector('.interactive-line');
+
+        terminalBody.addEventListener('click', () => {
+            if (window.getSelection().toString() === '') terminalInput.focus();
+        });
+
+        let currentPath = '~';
+        const commandHistory = [];
+        let historyIndex = -1, isExecuting = false;
+
+        const vfs = {
+            '~': { type:'dir', content: {
+                'about.txt': { type:'file', content:'System Log:<br>> Architecture initialized.<br>> Mod configurations loaded.' },
+                '.bashrc': { type:'file', content:'export TERM=xterm-256color<br>alias ll="ls -la"<br>alias gs="git status"' },
+                'projects': { type:'dir', content: {
+                    'OneKeyMiner': { type:'dir', content: {
+                        'README.md': { type:'file', content:'# OneKeyMiner<br><br>High-performance vein mining system.' },
+                        'todo.txt': { type:'file', content:'- optimize scan radius<br>- reduce network overhead<br>- add client-side animation' }
+                    } },
+                    'Piglin_WTO': { type:'dir', content: {
+                        'config.yml': { type:'file', content:'economy_mode: extreme<br>gold_tax: enabled<br>barter_policy: dynamic' }
+                    } }
+                } },
+                'notes': { type:'dir', content: {
+                    'ideas.md': { type:'file', content:'- interactive portfolio terminal<br>- ambient loader transition<br>- live GitHub repo panel' }
+                } },
+                'links.txt': { type:'file', content:'GitHub: https://github.com/Mai-xiyu<br>Docs: https://mai-xiyu.github.io/ProJect_Docs/' }
+            }}
+        };
+
+        function getPrompt() { return `<span style="color:#4ec9b0">mai@server</span>:<span style="color:#569cd6">${currentPath}</span>$`; }
+        function updatePrompt() { interactiveLine.querySelector('.cmd-prompt').innerHTML = getPrompt(); }
+        updatePrompt();
+
+        function escapeHtml(value) {
+            return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function getPathParts(path) {
+            return path === '~' ? [] : path.replace(/^~\/?/, '').split('/').filter(Boolean);
+        }
+
+        function getNode(path) {
+            if (path === '~') return vfs['~'];
+            let node = vfs['~'];
+            for (const part of getPathParts(path)) {
+                if (!node.content || !node.content[part]) return null;
+                node = node.content[part];
+            }
+            return node;
+        }
+
+        function getCurrentDir() {
+            const node = getNode(currentPath);
+            return node && node.type === 'dir' ? node.content : null;
+        }
+
+        function resolveTargetPath(input = '') {
+            if (!input || input === '.') return currentPath;
+            const segments = input.startsWith('~') ? getPathParts(input) : [...getPathParts(currentPath), ...input.split('/')];
+            const normalized = [];
+            for (const segment of segments) {
+                if (!segment || segment === '.') continue;
+                if (segment === '..') normalized.pop();
+                else normalized.push(segment);
+            }
+            return normalized.length ? `~/${normalized.join('/')}` : '~';
+        }
+
+        function getParentInfo(input) {
+            const targetPath = resolveTargetPath(input);
+            if (targetPath === '~') return null;
+            const parts = getPathParts(targetPath);
+            const name = parts.pop();
+            const parentPath = parts.length ? `~/${parts.join('/')}` : '~';
+            const parentNode = getNode(parentPath);
+            if (!parentNode || parentNode.type !== 'dir') return null;
+            return { name, parentPath, parentNode, targetPath };
+        }
+
+        function renderTree(path = currentPath, level = 0) {
+            const node = getNode(path);
+            if (!node || node.type !== 'dir') return 'tree: cannot access';
+            const entries = Object.entries(node.content || {});
+            if (!entries.length && level === 0) return '.<br>└── <span style="color:#8b949e">(empty)</span>';
+            const lines = level === 0 ? ['.'] : [];
+            entries.forEach(([name, child], index) => {
+                const isLast = index === entries.length - 1;
+                const prefix = `${'│   '.repeat(level)}${isLast ? '└── ' : '├── '}`;
+                const label = child.type === 'dir' ? `<span style="color:#569cd6">${escapeHtml(name)}</span>` : escapeHtml(name);
+                lines.push(`${prefix}${label}`);
+                if (child.type === 'dir') {
+                    const childPath = path === '~' ? `~/${name}` : `${path}/${name}`;
+                    const subtree = renderTree(childPath, level + 1).split('<br>').slice(level === 0 ? 1 : 0);
+                    lines.push(...subtree);
+                }
+            });
+            return lines.join('<br>');
+        }
+
+        function resolve(path) {
+            if (path === '~') return vfs['~'].content;
+            let cur = vfs['~'].content;
+            for (const p of path.split('/').slice(1)) { if (cur[p]) cur = cur[p].content; else return null; }
+            return cur;
+        }
+
+        const commandDocs = [
+            { cmd: 'help', desc: '显示帮助信息 / Print this help message' },
+            { cmd: 'man &lt;cmd&gt;', desc: '显示命令手册 / Show manual entry for a command' },
+            { cmd: 'about', desc: '显示站点信息 / Display information about this site' },
+            { cmd: 'whoami', desc: '显示当前用户名 / Print current user name' },
+            { cmd: 'id', desc: '显示用户与组信息 / Print user and group information' },
+            { cmd: 'pwd', desc: '显示当前目录 / Print current working directory' },
+            { cmd: 'ls', desc: '列出目录内容 / List directory contents' },
+            { cmd: 'tree', desc: '以树形显示目录 / List contents in a tree-like format' },
+            { cmd: 'cd &lt;dir&gt;', desc: '切换目录 / Change the current working directory' },
+            { cmd: 'cat &lt;file&gt;', desc: '输出文件内容 / Print file contents' },
+            { cmd: 'head &lt;file&gt;', desc: '显示文件前几行 / Output the first lines of a file' },
+            { cmd: 'wc &lt;file&gt;', desc: '统计行数词数字节数 / Print byte, word and line counts' },
+            { cmd: 'find &lt;name&gt;', desc: '按名称搜索文件 / Search for files and directories by name' },
+            { cmd: 'mkdir &lt;dir&gt;', desc: '创建目录 / Create a directory' },
+            { cmd: 'touch &lt;file&gt;', desc: '创建空文件 / Create an empty file' },
+            { cmd: 'rm &lt;name&gt;', desc: '删除文件或空目录 / Remove a file or empty directory' },
+            { cmd: 'echo &lt;text&gt;', desc: '输出文本 / Display a line of text' },
+            { cmd: 'date', desc: '显示当前时间 / Print the current date and time' },
+            { cmd: 'history', desc: '显示历史命令 / Display command history' },
+            { cmd: 'uname', desc: '显示系统信息 / Print system information' },
+            { cmd: 'neofetch', desc: '显示系统摘要 / Display system summary' },
+            { cmd: 'ps', desc: '显示进程快照 / Report a snapshot of current processes' },
+            { cmd: 'top', desc: '显示任务概览 / Display Linux tasks overview' },
+            { cmd: 'df', desc: '显示磁盘使用情况 / Report file system disk space usage' },
+            { cmd: 'free', desc: '显示内存使用情况 / Display amount of free and used memory' },
+            { cmd: 'ping &lt;host&gt;', desc: '测试网络连通性 / Send ICMP ECHO_REQUEST to network hosts' },
+            { cmd: 'repo', desc: '显示外部链接 / Show quick links to external profiles' },
+            { cmd: 'clear', desc: '清空终端 / Clear the terminal screen' },
+            { cmd: 'sudo', desc: '以其他用户身份执行 / Execute a command as another user' }
+        ];
+
+        const handlers = {
+            'help': () => {
+                return `<div style="display:grid; grid-template-columns: 140px 1fr; gap: 4px;">` + 
+                       commandDocs.map(c => `<span style="color:#dcdcaa">${c.cmd}</span><span style="color:#8b949e">${c.desc}</span>`).join('') + 
+                       `</div>`;
+            },
+            'man': (a) => {
+                if (!a.length) return '要查看哪个命令的手册？<br>例如：<span style="color:#dcdcaa">man ls</span>';
+                const query = a[0].toLowerCase();
+                const entry = commandDocs.find(item => item.cmd.replace(/&lt;.*?&gt;/g, '').trim().startsWith(query));
+                if (!entry) return `没有找到 ${escapeHtml(query)} 的手册 / No manual entry for ${escapeHtml(query)}`;
+                return `<span style="color:#dcdcaa">NAME / 名称</span><br>${entry.cmd} - ${entry.desc}<br><br><span style="color:#dcdcaa">SYNOPSIS / 用法</span><br>${entry.cmd}<br><br><span style="color:#dcdcaa">DESCRIPTION / 说明</span><br>${entry.desc}`;
+            },
+            'about': () => 'Mai_xiyu Terminal v1.0.0<br>Made with <span style="color:#e25555;">♥</span> by Mai_xiyu.<br>Explore the virtual file system or check out my repositories!',
+            'whoami': () => 'mai',
+            'id': () => 'uid=1000(mai) gid=1000(mai) groups=1000(mai),27(sudo),998(docker)',
+            'pwd': () => '/home/mai' + (currentPath === '~' ? '' : currentPath.replace('~','')),
+            'date': () => new Date().toString(),
+            'history': () => commandHistory.map((c,i) => `  ${i+1}  ${c}`).join('<br>') || 'No history.',
+            'echo': (a) => escapeHtml(a.join(' ')),
+            'uname': (a) => a.includes('-a')
+                ? 'Linux mai-server 6.8.0-portfolio #1 SMP PREEMPT_DYNAMIC x86_64 GNU/Linux'
+                : 'Linux',
+            'neofetch': () => 'OS: Ubuntu 24.04 LTS x86_64<br>Host: Core Architecture<br>Kernel: 6.8.0-portfolio<br>Shell: zsh<br>Theme: Frosted Glass Dark<br>Memory: 3.2 GiB / 16 GiB',
+            'ls': () => { const s = resolve(currentPath); return s ? Object.keys(s).map(k => s[k].type==='dir' ? `<span style="color:#569cd6">${k}/</span>` : (s[k].executable ? `<span style="color:#4ec9b0">${k}</span>` : escapeHtml(k))).join('  ') : ''; },
+            'tree': () => renderTree(),
+            'cd': (a) => {
+                const targetPath = resolveTargetPath(a[0] || '~');
+                const node = getNode(targetPath);
+                if (!node) return `bash: cd: ${escapeHtml(a[0] || '~')}: No such file or directory`;
+                if (node.type !== 'dir') return `bash: cd: ${escapeHtml(a[0] || '~')}: Not a directory`;
+                currentPath = targetPath;
+                updatePrompt();
+                return '';
+            },
+            'cat': (a) => {
+                if (!a.length) return 'cat: missing operand';
+                const node = getNode(resolveTargetPath(a[0]));
+                if (!node) return `cat: ${escapeHtml(a[0])}: No such file or directory`;
+                if (node.type !== 'file') return `cat: ${escapeHtml(a[0])}: Is a directory`;
+                return node.content;
+            },
+            'head': (a) => {
+                if (!a.length) return 'head: missing operand';
+                const node = getNode(resolveTargetPath(a[0]));
+                if (!node) return `head: cannot open '${escapeHtml(a[0])}' for reading: No such file or directory`;
+                if (node.type !== 'file') return `head: error reading '${escapeHtml(a[0])}': Is a directory`;
+                return node.content.split('<br>').slice(0, 10).join('<br>');
+            },
+            'wc': (a) => {
+                if (!a.length) return 'wc: missing operand';
+                const node = getNode(resolveTargetPath(a[0]));
+                if (!node) return `wc: ${escapeHtml(a[0])}: No such file or directory`;
+                if (node.type !== 'file') return `wc: ${escapeHtml(a[0])}: Is a directory`;
+                const plain = node.content.replace(/<br>/g, '\n').replace(/<[^>]+>/g, '');
+                const lines = plain.split('\n').length;
+                const words = plain.trim() ? plain.trim().split(/\s+/).length : 0;
+                const bytes = new TextEncoder().encode(plain).length;
+                return `${lines} ${words} ${bytes} ${escapeHtml(a[0])}`;
+            },
+            'find': (a) => {
+                if (!a.length) return 'find: missing search term';
+                const query = a.join(' ').toLowerCase();
+                const matches = [];
+                const walk = (path, node) => {
+                    if (path !== '~' && path.split('/').pop().toLowerCase().includes(query)) matches.push(path.replace('~', '/home/mai'));
+                    if (node.type === 'dir') {
+                        Object.entries(node.content).forEach(([name, child]) => {
+                            const childPath = path === '~' ? `~/${name}` : `${path}/${name}`;
+                            walk(childPath, child);
+                        });
+                    }
+                };
+                walk('~', vfs['~']);
+                return matches.length ? matches.map(escapeHtml).join('<br>') : `find: no match for '${escapeHtml(query)}'`;
+            },
+            'mkdir': (a) => {
+                if (!a.length) return 'mkdir: missing operand';
+                const info = getParentInfo(a[0]);
+                if (!info) return `mkdir: cannot create directory '${escapeHtml(a[0])}': No such file or directory`;
+                if (info.parentNode.content[info.name]) return `mkdir: cannot create directory '${escapeHtml(info.name)}': File exists`;
+                info.parentNode.content[info.name] = { type: 'dir', content: {} };
+                return '';
+            },
+            'touch': (a) => {
+                if (!a.length) return 'touch: missing file operand';
+                const info = getParentInfo(a[0]);
+                if (!info) return `touch: cannot touch '${escapeHtml(a[0])}': No such file or directory`;
+                if (!info.parentNode.content[info.name]) info.parentNode.content[info.name] = { type: 'file', content: '' };
+                return '';
+            },
+            'rm': (a) => {
+                if (!a.length) return 'rm: missing operand';
+                const info = getParentInfo(a[0]);
+                if (!info || !info.parentNode.content[info.name]) return `rm: cannot remove '${escapeHtml(a[0])}': No such file or directory`;
+                const node = info.parentNode.content[info.name];
+                if (node.type === 'dir' && Object.keys(node.content).length) return `rm: cannot remove '${escapeHtml(a[0])}': Directory not empty`;
+                delete info.parentNode.content[info.name];
+                return '';
+            },
+            'ps': () => 'PID TTY          TIME CMD<br>1001 pts/0    00:00:00 zsh<br>1024 pts/0    00:00:00 node<br>1108 pts/0    00:00:00 portfolio-terminal',
+            'top': () => 'top - 14:24:11 up 12 days,  3:42,  1 user,  load average: 0.08, 0.12, 0.18<br>Tasks: 128 total,   1 running, 127 sleeping,   0 stopped,   0 zombie<br>%Cpu(s): 4.7 us, 1.2 sy, 0.0 ni, 93.8 id<br>MiB Mem :  15872.0 total,   9276.3 free,   3480.1 used,   3115.6 buff/cache',
+            'df': () => 'Filesystem      Size  Used Avail Use% Mounted on<br>/dev/nvme0n1p2  476G   88G  364G  20% /<br>tmpfs            7.8G  4.0M  7.8G   1% /run',
+            'free': () => '               total        used        free      shared  buff/cache   available<br>Mem:        16252928     3563520     9484288      184320     3205120    12145152<br>Swap:        4194300           0     4194300',
+            'repo': () => 'GitHub: <a href="https://github.com/Mai-xiyu" target="_blank" style="color:#60a5fa">github.com/Mai-xiyu</a><br>Docs: <a href="https://mai-xiyu.github.io/ProJect_Docs/" target="_blank" style="color:#60a5fa">Project Docs</a><br>Modrinth: <a href="https://modrinth.com/user/Mai_xiyu" target="_blank" style="color:#60a5fa">Mai_xiyu</a>',
+            'sudo': () => 'mai is not in the sudoers file. This incident will be reported.',
+            'ping': async (a) => {
+                if (!a.length) return 'Usage: ping &lt;destination&gt;';
+                const host = a[0].replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                isExecuting = true; terminalInput.disabled = true;
+                const out = document.createElement('div'); out.className = 'cmd-output';
+                out.innerHTML = `PING ${host} (192.0.2.1): 56 data bytes`;
+                terminalBody.insertBefore(out, interactiveLine);
+                for(let i=1;i<=3;i++) { await new Promise(r=>setTimeout(r,700)); out.innerHTML+=`<br>64 bytes: icmp_seq=${i} ttl=54 time=${(10+Math.random()*5).toFixed(1)} ms`; terminalBody.scrollTop=terminalBody.scrollHeight; }
+                await new Promise(r=>setTimeout(r,300));
+                out.innerHTML+=`<br>--- ${host} ping statistics ---<br>3 packets transmitted, 3 received, 0% loss`;
+                terminalBody.scrollTop=terminalBody.scrollHeight;
+                isExecuting=false; terminalInput.disabled=false; terminalInput.focus();
+                return null;
+            }
+        };
+
+        terminalInput.addEventListener('keydown', async function(e) {
+            if (isExecuting) { e.preventDefault(); return; }
+            if (e.key==='ArrowUp') { e.preventDefault(); if(historyIndex<commandHistory.length-1){historyIndex++;this.value=commandHistory[commandHistory.length-1-historyIndex];} }
+            else if (e.key==='ArrowDown') { e.preventDefault(); if(historyIndex>0){historyIndex--;this.value=commandHistory[commandHistory.length-1-historyIndex];}else if(historyIndex===0){historyIndex=-1;this.value='';} }
+            else if (e.key==='Tab') {
+                e.preventDefault();
+                const pts=this.value.split(' '), kw=pts[pts.length-1];
+                const s=resolve(currentPath) || {};
+                const matches=[...Object.keys(handlers),...Object.keys(s)].filter(p=>p.startsWith(kw));
+                if(matches.length===1){pts[pts.length-1]=matches[0];this.value=pts.join(' ');}
+            }
+            else if (e.key==='Enter') {
+                const raw=this.value.trim(); this.value=''; historyIndex=-1;
+                if(!raw){const d=document.createElement('div');d.className='cmd-line';d.innerHTML=`<span class="cmd-prompt">${getPrompt()}</span>`;terminalBody.insertBefore(d,interactiveLine);terminalBody.scrollTop=terminalBody.scrollHeight;return;}
+                if(commandHistory[commandHistory.length-1]!==raw) commandHistory.push(raw);
+                const echo=document.createElement('div');echo.className='cmd-line';
+                const safe=raw.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                echo.innerHTML=`<span class="cmd-prompt">${getPrompt()}</span> ${safe}`;
+                terminalBody.insertBefore(echo,interactiveLine);
+                const parts=raw.split(' ').filter(Boolean), cmd=parts[0].toLowerCase(), args=parts.slice(1);
+                if(cmd==='clear'){terminalBody.querySelectorAll('.cmd-line:not(.interactive-line),.cmd-output').forEach(l=>l.remove());}
+                else{let r; if(handlers[cmd])r=await handlers[cmd](args);else if(handlers['./'+cmd])r=await handlers['./'+cmd](args);else r=`bash: ${safe.split(' ')[0]}: command not found`; if(r!=null&&r!==''){const o=document.createElement('div');o.className='cmd-output';o.innerHTML=r;terminalBody.insertBefore(o,interactiveLine);}}
+                terminalBody.scrollTop=terminalBody.scrollHeight;
+            }
+        });
+    });
 </script>
-
 </body>
 </html>
