@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 | Mai_xiyu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --glass-blur: 24px;
+            --accent: #3b82f6;
+            --accent-green: #10b981;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --term-bg: #111116;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #loader {
+            position: fixed; inset: 0; z-index: 10000;
+            background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+        .loaded #loader { transform: translateY(-100%); }
+        .loader-content {
+            width: 0; height: 2px; background: #fff;
+            animation: lineExpand 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        .loader-text {
+            margin-top: 15px; font-family: 'Fira Code', monospace;
+            font-size: 0.8rem; letter-spacing: 6px; color: #555;
+            opacity: 0; animation: fadeText 1s forwards 0.3s;
+        }
+        @keyframes lineExpand { 0% { width: 0; } 100% { width: 250px; } }
+        @keyframes fadeText { to { opacity: 1; } }
+
+        .container {
+            min-height: 100vh;
+            max-width: 1000px; margin: 0 auto; padding: 80px 20px;
+            position: relative; z-index: 1;
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 1s ease 0.4s, transform 1s cubic-bezier(0.25, 1, 0.25, 1) 0.4s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .loaded .container { opacity: 1; transform: translateY(0); }
+
+        .bg-blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .blob {
+            position: absolute; border-radius: 50%; filter: blur(100px);
+            animation: floatBlob 20s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+        }
+        .blob-1 { width: 50vw; height: 50vw; background: rgba(59, 130, 246, 0.15); top: -20%; left: -10%; animation-delay: 0s; }
+        .blob-2 { width: 40vw; height: 40vw; background: rgba(16, 185, 129, 0.12); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .blob-3 { width: 30vw; height: 30vw; background: rgba(139, 92, 246, 0.15); top: 40%; left: 30%; animation-delay: -10s; }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(5%, 10%) scale(1.1); }
+            100% { transform: translate(-5%, -5%) scale(0.95); }
+        }
+
+        .card {
+            width: min(100%, 760px);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 24px; backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur));
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            padding: 48px 36px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::after {
+            content: '';
+            position: absolute;
+            inset: -35%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.14) 0%, transparent 55%);
+            animation: ambientGlow 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .not-found {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+        .not-found-code {
+            font-size: clamp(4.5rem, 18vw, 8rem);
+            line-height: 1;
+            letter-spacing: -4px;
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.28);
+            animation: glitch 3s infinite, floatCode 4.5s ease-in-out infinite;
+        }
+        .not-found-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+        .live-dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.85);
+            animation: pulse 2s infinite;
+        }
+        .not-found h1 {
+            font-size: clamp(1.9rem, 5vw, 3rem);
+            letter-spacing: -1px;
+        }
+        .not-found p {
+            max-width: 34rem;
+            color: var(--text-muted);
+            animation: fadeUp 0.8s ease 0.15s both;
+        }
+        .actions {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .btn {
+            text-decoration: none; padding: 10px 20px; border-radius: 8px;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            color: var(--text-main); font-size: 0.95rem; font-weight: 500;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px;
+            position: relative; overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.16) 50%, transparent 100%);
+            transform: translateX(-130%);
+            transition: transform 0.6s ease;
+        }
+        .btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .btn:hover::before { transform: translateX(130%); }
+        .btn-primary {
+            background: rgba(59, 130, 246, 0.16);
+            border-color: rgba(96, 165, 250, 0.25);
+        }
+
+        @keyframes pulse { 50% { opacity: 0.3; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatCode { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes ambientGlow { 0%, 100% { opacity: 0.45; transform: scale(0.95); } 50% { opacity: 0.8; transform: scale(1.08); } }
+        @keyframes glitch {
+            0%, 100% { text-shadow: 0 0 30px rgba(59, 130, 246, 0.28); }
+            20% { text-shadow: -2px 0 rgba(16, 185, 129, 0.5), 2px 0 rgba(59, 130, 246, 0.45); }
+            40% { text-shadow: 2px 0 rgba(139, 92, 246, 0.5), -2px 0 rgba(59, 130, 246, 0.4); }
+            60% { text-shadow: -1px 0 rgba(16, 185, 129, 0.45), 1px 0 rgba(59, 130, 246, 0.4); }
+            80% { text-shadow: 1px 0 rgba(139, 92, 246, 0.45), -1px 0 rgba(59, 130, 246, 0.4); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 40px 16px; }
+            .card { padding: 36px 24px; border-radius: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader">
+    <div class="loader-content"></div>
+    <div class="loader-text">RECOVERING ROUTE...</div>
+</div>
+
+<div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<main class="container">
+    <section class="card">
+        <div class="not-found">
+            <span class="not-found-tag"><span class="live-dot"></span> Route status: missing</span>
+            <div class="not-found-code">404</div>
+            <h1>页面不存在，但风格还在。</h1>
+            <p>你访问的页面可能已经移动、删除，或者链接写错了。返回主页继续浏览当前站点内容，或者前往 GitHub 查看更多项目。</p>
+            <div class="actions">
+                <a href="/" class="btn btn-primary"><i class="fas fa-house"></i> 返回首页</a>
+                <a href="https://github.com/Mai-xiyu" class="btn" target="_blank" rel="noreferrer"><i class="fab fa-github"></i> GitHub</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.body.classList.add('loaded');
+        }, 1200);
+    });
+</script>
+</body>
+</html>
